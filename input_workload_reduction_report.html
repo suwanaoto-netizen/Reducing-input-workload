@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>入力工数削減要望レポート | X Mile Insight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #FAF8F3;
+  --bg-elevated: #FFFFFF;
+  --ink: #1A1A1A;
+  --ink-soft: #555555;
+  --ink-mute: #888888;
+  --line: #E5DFD2;
+  --line-strong: #1A1A1A;
+  --accent: #C8553D;
+  --accent-soft: #E9B384;
+  --teal: #2C5F5D;
+  --gold: #B8860B;
+  --serif: 'Noto Serif JP', Georgia, serif;
+  --sans: 'Inter', -apple-system, 'Hiragino Kaku Gothic ProN', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--ink); line-height: 1.6; font-size: 14px; -webkit-font-smoothing: antialiased; }
+.container { max-width: 1180px; margin: 0 auto; padding: 60px 48px 80px; }
+
+/* Masthead */
+.masthead { border-top: 4px solid var(--line-strong); border-bottom: 1px solid var(--line); padding: 24px 0 32px; margin-bottom: 48px; position: relative; }
+.masthead-meta { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 16px; }
+.masthead-meta .issue { color: var(--accent); font-weight: 500; }
+.masthead h1 { font-family: var(--serif); font-size: 48px; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 16px; }
+.masthead h1 .accent { color: var(--accent); font-style: italic; }
+.masthead-sub { font-size: 16px; color: var(--ink-soft); max-width: 800px; line-height: 1.7; }
+
+/* Stat Grid */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 56px; }
+.stat { padding: 28px 24px; border-right: 1px solid var(--line); }
+.stat:last-child { border-right: none; }
+.stat-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-mute); margin-bottom: 12px; }
+.stat-value { font-family: var(--serif); font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+.stat-value .unit { font-size: 16px; font-weight: 400; color: var(--ink-mute); margin-left: 6px; }
+.stat-sub { font-size: 11px; color: var(--ink-mute); margin-top: 10px; font-family: var(--mono); }
+
+/* TOC */
+.toc { background: var(--bg-elevated); border: 1px solid var(--line); padding: 28px 32px; margin-bottom: 64px; }
+.toc-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 20px; }
+.toc ol { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 32px; }
+.toc ol li { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 10px; border-bottom: 1px dotted var(--line); }
+.toc ol li a { color: var(--ink); text-decoration: none; display: flex; gap: 12px; align-items: baseline; flex: 1; }
+.toc-num { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 500; }
+.toc-title-text { font-family: var(--serif); font-size: 15px; }
+.toc ol li a:hover .toc-title-text { color: var(--accent); }
+.toc-count { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); }
+
+/* Chart Section */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 64px; }
+.chart-card { background: var(--bg-elevated); border: 1px solid var(--line); padding: 28px; }
+.chart-card.wide { grid-column: 1 / -1; }
+.chart-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.chart-title { font-family: var(--serif); font-size: 18px; font-weight: 700; }
+.chart-meta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--ink-mute); text-transform: uppercase; }
+.chart-wrapper { position: relative; width: 100%; height: 320px; }
+.chart-wrapper.tall { height: 380px; }
+
+/* Group Section */
+.group-section { margin-bottom: 72px; }
+.group-header { display: grid; grid-template-columns: 80px 1fr; gap: 20px; align-items: baseline; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--line-strong); }
+.group-num { font-family: var(--mono); font-size: 14px; color: var(--accent); letter-spacing: 0.05em; font-weight: 500; padding-top: 6px; }
+.group-title { font-family: var(--serif); font-size: 26px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.25; margin-bottom: 8px; }
+.group-summary { font-size: 13.5px; color: var(--ink-soft); line-height: 1.7; }
+
+.group-stats { display: grid; grid-template-columns: repeat(3, max-content); gap: 36px; padding: 16px 0; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.gs { display: flex; flex-direction: column; gap: 4px; }
+.gs-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute); }
+.gs-value { font-family: var(--serif); font-size: 22px; font-weight: 700; }
+.gs-value .unit { font-size: 12px; font-weight: 400; color: var(--ink-mute); margin-left: 4px; }
+.gs-value.mono { font-family: var(--mono); font-size: 18px; }
+
+.group-accounts { background: var(--bg-elevated); border-left: 3px solid var(--accent); padding: 14px 20px; margin-bottom: 24px; font-size: 13px; }
+.ga-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-right: 12px; font-weight: 500; }
+.ga-list { color: var(--ink); line-height: 1.7; }
+
+/* Request Card */
+.req-list { display: flex; flex-direction: column; gap: 12px; }
+.req-card { background: var(--bg-elevated); border: 1px solid var(--line); padding: 18px 22px; transition: border-color 0.15s; }
+.req-card:hover { border-color: var(--accent); }
+.req-head { display: grid; grid-template-columns: 200px 1fr auto; gap: 16px; align-items: baseline; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dotted var(--line); }
+.req-no { font-family: var(--mono); font-size: 12px; color: var(--teal); font-weight: 500; text-decoration: none; }
+.req-no:hover { color: var(--accent); }
+.req-no .ext { font-size: 10px; color: var(--ink-mute); }
+.req-account { font-family: var(--serif); font-size: 15px; font-weight: 700; }
+.req-arr { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.req-arr.arr-high { color: var(--accent); font-weight: 700; }
+.req-arr.arr-mid { color: var(--gold); }
+.req-meta { font-family: var(--mono); font-size: 10.5px; color: var(--ink-mute); letter-spacing: 0.03em; margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+.req-meta .req-service { color: var(--teal); font-weight: 500; }
+.req-text { font-size: 13px; color: var(--ink); line-height: 1.75; padding-left: 12px; border-left: 2px solid var(--line); }
+
+/* Footer */
+.footer { border-top: 4px solid var(--line-strong); padding-top: 28px; margin-top: 80px; display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); font-size: 11px; color: var(--ink-mute); letter-spacing: 0.05em; }
+.footer-brand { color: var(--accent); font-weight: 500; letter-spacing: 0.1em; }
+
+@media (max-width: 880px) {
+  .container { padding: 32px 20px; }
+  .masthead h1 { font-size: 32px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat { border-bottom: 1px solid var(--line); }
+  .charts-row { grid-template-columns: 1fr; }
+  .toc ol { grid-template-columns: 1fr; }
+  .group-header { grid-template-columns: 1fr; }
+  .req-head { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="masthead">
+  <div class="masthead-meta">
+    <span class="issue">X MILE INSIGHT REPORT / VOL.PI-002</span>
+    <span>PERIOD: 2023.09 - 2026.05 ／ N = 45</span>
+  </div>
+  <h1>入力工数削減を求める<br><span class="accent">プロダクト要望</span>の全体像</h1>
+  <p class="masthead-sub">
+    Salesforce <code>Product_Improvement__c</code> から「OCR・手入力・自動連携・一括登録・二度手間・工数削減」等のキーワードで抽出した
+    45件の要望を、テーマ別に8グループへ分類。お客様が「ロジポケに入力するために発生している摩擦」がどこにあるかを俯瞰します。
+  </p>
+</header>
+
+<div class="stat-grid">
+  <div class="stat">
+    <div class="stat-label">Total Requests</div>
+    <div class="stat-value">45<span class="unit">件</span></div>
+    <div class="stat-sub">across 8 themes</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Unique Companies</div>
+    <div class="stat-value">38<span class="unit">社</span></div>
+    <div class="stat-sub">distinct accounts</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Total ARR (重複含)</div>
+    <div class="stat-value" style="font-family:var(--mono);font-size:24px">¥60,345,600</div>
+    <div class="stat-sub">sum of all PI_ARR</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Unique ARR</div>
+    <div class="stat-value" style="font-family:var(--mono);font-size:24px">¥44,343,600</div>
+    <div class="stat-sub">deduped by account</div>
+  </div>
+</div>
+
+<nav class="toc">
+  <div class="toc-title">— Table of Themes —</div>
+  <ol>
+    <li><a href="#g1"><span class="toc-num">§01</span><span class="toc-title-text">紙書類・画像からのOCR / 自動読み取り</span></a><span class="toc-count">5件</span></li>
+<li><a href="#g2"><span class="toc-num">§02</span><span class="toc-title-text">CSV / Excel一括インポート・エクスポートの拡充</span></a><span class="toc-count">7件</span></li>
+<li><a href="#g3"><span class="toc-num">§03</span><span class="toc-title-text">デジタコ・アルコールチェッカー等の外部機器との自動連携</span></a><span class="toc-count">11件</span></li>
+<li><a href="#g4"><span class="toc-num">§04</span><span class="toc-title-text">集合受講・複数人一括処理（教育・点呼）</span></a><span class="toc-count">6件</span></li>
+<li><a href="#g5"><span class="toc-num">§05</span><span class="toc-title-text">案件・配車・請求管理での手入力・二度手間</span></a><span class="toc-count">6件</span></li>
+<li><a href="#g6"><span class="toc-num">§06</span><span class="toc-title-text">教育・台帳まわりのUI改善（手入力体験の改善）</span></a><span class="toc-count">5件</span></li>
+<li><a href="#g7"><span class="toc-num">§07</span><span class="toc-title-text">計画・コンテンツの複製・展開機能</span></a><span class="toc-count">3件</span></li>
+<li><a href="#g8"><span class="toc-num">§08</span><span class="toc-title-text">動画教材検索・絞り込みでの工数削減</span></a><span class="toc-count">2件</span></li>
+  </ol>
+</nav>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h3 class="chart-title">テーマ別件数分布</h3>
+      <span class="chart-meta">By Group</span>
+    </div>
+    <div class="chart-wrapper"><canvas id="groupChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <h3 class="chart-title">サービス別件数 TOP10</h3>
+      <span class="chart-meta">By Service</span>
+    </div>
+    <div class="chart-wrapper"><canvas id="serviceChart"></canvas></div>
+  </div>
+  <div class="chart-card wide">
+    <div class="chart-card-header">
+      <h3 class="chart-title">複数要望を抱える企業（2件以上）</h3>
+      <span class="chart-meta">Multi-Request Accounts</span>
+    </div>
+    <div class="chart-wrapper"><canvas id="accountChart"></canvas></div>
+  </div>
+</div>
+
+
+    <section id="g1" class="group-section">
+      <div class="group-header">
+        <div class="group-num">§01</div>
+        <div class="group-head-main">
+          <h2 class="group-title">紙書類・画像からのOCR / 自動読み取り</h2>
+          <p class="group-summary">免許証・適性診断・車検証など、紙書類や写真からOCRや機器連携で自動入力したい要望。</p>
+        </div>
+      </div>
+      
+      <div class="group-stats">
+        <div class="gs"><span class="gs-label">件数</span><span class="gs-value">5<span class="unit">件</span></span></div>
+        <div class="gs"><span class="gs-label">企業数</span><span class="gs-value">4<span class="unit">社</span></span></div>
+        <div class="gs"><span class="gs-label">関連ARR</span><span class="gs-value mono">¥8,589,600</span></div>
+      </div>
+      
+      <div class="group-accounts">
+        <span class="ga-label">要望企業</span>
+        <span class="ga-list">アチハ株式会社、イオンネクストデリバリー株式会社、日発運輸株式会社、株式会社エムエス物流</span>
+      </div>
+      
+      <div class="req-list">
+        
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000001BccT2AS/view" target="_blank" rel="noopener">ProductRequest-444 <span class="ext">↗</span></a>
+        <div class="req-account">日発運輸株式会社</div>
+        <div class="req-arr arr-mid">¥1,836,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">従業員台帳</span>
+        <span class="req-func">／ 従業員管理</span>
+        <span class="req-date">2025-10-14</span>
+      </div>
+      <div class="req-text">紙ベースで台帳管理しており、入力工数の負荷が大きいため、OCRでの読み取りができるようにしてほしい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002f4BN2AY/view" target="_blank" rel="noopener">ProductRequest-641 <span class="ext">↗</span></a>
+        <div class="req-account">アチハ株式会社</div>
+        <div class="req-arr ">¥403,200</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">車両台帳</span>
+        <span class="req-func">／ アラート</span>
+        <span class="req-date">2026-03-17</span>
+      </div>
+      <div class="req-text">CSV一括登録ではなく、写真や画像のスキャンで情報読み込みしたい（現状写真・データで管理しており、1件1件入力するのが煩わしく移行が進まない）。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000007waL2AQ/view" target="_blank" rel="noopener">ProductRequest-278 <span class="ext">↗</span></a>
+        <div class="req-account">イオンネクストデリバリー株式会社</div>
+        <div class="req-arr arr-mid">¥2,862,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 車両管理_車検入力簡素化</span>
+        <span class="req-date">2025-04-02</span>
+      </div>
+      <div class="req-text">車検・3検を車体番号から自動取得できないか。できなければOCRが欲しい。実現すればリプレイス検討あり。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000007wX72AI/view" target="_blank" rel="noopener">ProductRequest-276 <span class="ext">↗</span></a>
+        <div class="req-account">イオンネクストデリバリー株式会社</div>
+        <div class="req-arr arr-mid">¥2,862,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 従業員台帳_適性診断OCR</span>
+        <span class="req-date">2025-04-02</span>
+      </div>
+      <div class="req-text">適性診断の記録をOCRでデータ化したい。事故情報と適性診断データを照合して分析したい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000004sJZ2AY/view" target="_blank" rel="noopener">ProductRequest-160 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社エムエス物流</div>
+        <div class="req-arr ">¥626,400</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 従業員管理</span>
+        <span class="req-date">2024-12-24</span>
+      </div>
+      <div class="req-text">免許証リーダーにタッチすると該当従業員の免許証情報を自動入力する機能。免許証情報の入力工数が相当数かかる。</div>
+    </div>
+    
+      </div>
+    </section>
+    
+
+    <section id="g2" class="group-section">
+      <div class="group-header">
+        <div class="group-num">§02</div>
+        <div class="group-head-main">
+          <h2 class="group-title">CSV / Excel一括インポート・エクスポートの拡充</h2>
+          <p class="group-summary">従業員・案件・年間計画・事故報告などをCSV/Excelで一括取り込み・出力したい要望。既存システムからの移行ハードルを下げる狙い。</p>
+        </div>
+      </div>
+      
+      <div class="group-stats">
+        <div class="gs"><span class="gs-label">件数</span><span class="gs-value">7<span class="unit">件</span></span></div>
+        <div class="gs"><span class="gs-label">企業数</span><span class="gs-value">7<span class="unit">社</span></span></div>
+        <div class="gs"><span class="gs-label">関連ARR</span><span class="gs-value mono">¥6,198,000</span></div>
+      </div>
+      
+      <div class="group-accounts">
+        <span class="ga-label">要望企業</span>
+        <span class="ga-list">アストラックス株式会社、イオンネクストデリバリー株式会社、三ヶ根運輸株式会社、名糖運輸株式会社、日発運輸株式会社、株式会社イディアトランスポートサービス、池畑運送株式会社</span>
+      </div>
+      
+      <div class="req-list">
+        
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002eVLh2AM/view" target="_blank" rel="noopener">ProductRequest-631 <span class="ext">↗</span></a>
+        <div class="req-account">日発運輸株式会社</div>
+        <div class="req-arr arr-mid">¥1,836,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ CSVインポート</span>
+        <span class="req-date">2026-03-16</span>
+      </div>
+      <div class="req-text">年間教育計画（安全衛生向上計画書）をCSV/Excelで一括インポートしたい。カスタム項目もCSV取込に対応してほしい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000001VxZV2A0/view" target="_blank" rel="noopener">ProductRequest-499 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社イディアトランスポートサービス</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">案件管理</span>
+        <span class="req-func">／ 配車表＿UIUX</span>
+        <span class="req-date">2025-11-19</span>
+      </div>
+      <div class="req-text">過去データや他システムのデータをCSVで一括取込・出力したい。請求データをCSV出力してExcelで加工したい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000007wVV2AY/view" target="_blank" rel="noopener">ProductRequest-275 <span class="ext">↗</span></a>
+        <div class="req-account">イオンネクストデリバリー株式会社</div>
+        <div class="req-arr arr-mid">¥2,862,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 従業員台帳_csv入力拡充</span>
+        <span class="req-date">2025-04-02</span>
+      </div>
+      <div class="req-text">従業員台帳の全項目をCSVで一括登録したい。保険番号がCSV/API連携されておらず手入力で事務員から不評。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000008oRGPEA2/view" target="_blank" rel="noopener">ProductRequest-28 <span class="ext">↗</span></a>
+        <div class="req-account">三ヶ根運輸株式会社</div>
+        <div class="req-arr ">¥420,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 従業員管理_csvインポート</span>
+        <span class="req-date">2024-02-15</span>
+      </div>
+      <div class="req-text">受講対象者の一括チェック外し作業が手間。一括インポートの項目として追加してほしい。全項目を一括インポートしたい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000008o8jwEAA/view" target="_blank" rel="noopener">ProductRequest-24 <span class="ext">↗</span></a>
+        <div class="req-account">池畑運送株式会社</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 車両管理_csvインポート</span>
+        <span class="req-date">2024-02-01</span>
+      </div>
+      <div class="req-text">他システムに台帳項目すべてが登録されているが、一部の項目しかインポートできず移行ハードルが高い。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000007WirPEAS/view" target="_blank" rel="noopener">ProductRequest-11 <span class="ext">↗</span></a>
+        <div class="req-account">名糖運輸株式会社</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 事故報告管理_csvインポート</span>
+        <span class="req-date">2023-09-26</span>
+      </div>
+      <div class="req-text">過去の事故データを一括インポートしたい（想定800件/年×3年）。前年対比でデータを出力したい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2F5i000000EW88EAG/view" target="_blank" rel="noopener">ProductRequest-76 <span class="ext">↗</span></a>
+        <div class="req-account">アストラックス株式会社</div>
+        <div class="req-arr arr-mid">¥1,080,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ 受講履歴_csv入力</span>
+        <span class="req-date">2024-05-09</span>
+      </div>
+      <div class="req-text">集合受講時の履歴を120名全員分1人ずつ登録するのが面倒で使えない。一括登録・簡易登録ができれば更新も検討。</div>
+    </div>
+    
+      </div>
+    </section>
+    
+
+    <section id="g3" class="group-section">
+      <div class="group-header">
+        <div class="group-num">§03</div>
+        <div class="group-head-main">
+          <h2 class="group-title">デジタコ・アルコールチェッカー等の外部機器との自動連携</h2>
+          <p class="group-summary">デジタコ・アルコールチェッカー・銀行口座など外部機器/システムからのデータをロジポケに自動連携し、手入力や二度手間を解消したい要望。</p>
+        </div>
+      </div>
+      
+      <div class="group-stats">
+        <div class="gs"><span class="gs-label">件数</span><span class="gs-value">11<span class="unit">件</span></span></div>
+        <div class="gs"><span class="gs-label">企業数</span><span class="gs-value">11<span class="unit">社</span></span></div>
+        <div class="gs"><span class="gs-label">関連ARR</span><span class="gs-value mono">¥8,856,000</span></div>
+      </div>
+      
+      <div class="group-accounts">
+        <span class="ga-label">要望企業</span>
+        <span class="ga-list">イオンネクストデリバリー株式会社、ダイセーエブリー二十四株式会社、南星キャリックス株式会社、常北運輸株式会社、有限会社岩﨑運送、株式会社トータスカーアシスタンス、株式会社伊藤園、株式会社大門、株式会社山一商事、株式会社西日本トランスポート、関西低温株式会社</span>
+      </div>
+      
+      <div class="req-list">
+        
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002lfxp2AA/view" target="_blank" rel="noopener">ProductRequest-652 <span class="ext">↗</span></a>
+        <div class="req-account">有限会社岩﨑運送</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">勤怠管理</span>
+        <span class="req-func">／ ロジポケ労務機能とデジタコとの連携</span>
+        <span class="req-date">2026-03-26</span>
+      </div>
+      <div class="req-text">富士通製デジタコと連携可能だが、出庫・帰庫がそのまま出退勤に集計され、休憩・実労働の自動判別が不十分。別途手入力で「二度手間」。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000001uLFh2AM/view" target="_blank" rel="noopener">ProductRequest-522 <span class="ext">↗</span></a>
+        <div class="req-account">南星キャリックス株式会社</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">車両台帳</span>
+        <span class="req-func">／ 矢崎のデジタコから走行距離を取るためにAPI連携</span>
+        <span class="req-date">2025-12-26</span>
+      </div>
+      <div class="req-text">グリーン経営資料で走行距離を打ち込むのに相当時間がかかっており、API連携されれば工数がなくなる。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000000BOGj2AO/view" target="_blank" rel="noopener">ProductRequest-318 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社トータスカーアシスタンス</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ アルコールチェック</span>
+        <span class="req-date">2025-05-23</span>
+      </div>
+      <div class="req-text">ロジポケとアルコールチェッカーの自動連携。改ざん防止と手間削減のため数値を自動取込したい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000000BDZp2AO/view" target="_blank" rel="noopener">ProductRequest-314 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社伊藤園</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ アルコールチェック</span>
+        <span class="req-date">2025-05-22</span>
+      </div>
+      <div class="req-text">システムとアルコールチェック機器が自動で連動し数値を取り込む機能（PC・アプリ共）。比較検討中で必須要件。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000009QzN2AU/view" target="_blank" rel="noopener">ProductRequest-301 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社西日本トランスポート</div>
+        <div class="req-arr ">¥384,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 車両管理</span>
+        <span class="req-date">2025-05-02</span>
+      </div>
+      <div class="req-text">矢崎デジタコと給油履歴・運転免許証・生体認証も含めて自動連携してほしい。次点でCSV取込でも可。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000004uMz2AI/view" target="_blank" rel="noopener">ProductRequest-216 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社大門</div>
+        <div class="req-arr arr-mid">¥1,020,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">新規機能</span>
+        <span class="req-func">／ 勤怠管理</span>
+        <span class="req-date">2024-12-25</span>
+      </div>
+      <div class="req-text">IT点呼・デジタコ（みまもり）との自動連携。アプリで手押しすると二重で操作することになる。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000004uGX2AY/view" target="_blank" rel="noopener">ProductRequest-212 <span class="ext">↗</span></a>
+        <div class="req-account">常北運輸株式会社</div>
+        <div class="req-arr ">¥390,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">新規機能</span>
+        <span class="req-func">／ 勤怠管理</span>
+        <span class="req-date">2024-12-25</span>
+      </div>
+      <div class="req-text">yazakiデジタコのデータをロジポケに連携してほしい。給与計算・監査もデジタコデータ基準のため、二重操作になる。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000001L57N2AS/view" target="_blank" rel="noopener">ProductRequest-464 <span class="ext">↗</span></a>
+        <div class="req-account">ダイセーエブリー二十四株式会社</div>
+        <div class="req-arr arr-high">¥4,200,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ 受講履歴</span>
+        <span class="req-date">2025-10-29</span>
+      </div>
+      <div class="req-text">SmartHRとのAPI連携。人事評価の中で教育記録を管理したい。SmartHRと統合できないと解約懸念。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000007wTt2AI/view" target="_blank" rel="noopener">ProductRequest-274 <span class="ext">↗</span></a>
+        <div class="req-account">イオンネクストデリバリー株式会社</div>
+        <div class="req-arr arr-mid">¥2,862,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 事故報告管理_分析機能</span>
+        <span class="req-date">2025-04-02</span>
+      </div>
+      <div class="req-text">事故報告の分析データベース開発、または自社システムへのAPI連携。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2F5i000000EUQ5EAO/view" target="_blank" rel="noopener">ProductRequest-73 <span class="ext">↗</span></a>
+        <div class="req-account">関西低温株式会社</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">経営管理ダッシュボード</span>
+        <span class="req-func">／ 請求管理_銀行口座自動連携</span>
+        <span class="req-date">2024-05-08</span>
+      </div>
+      <div class="req-text">銀行口座と連携し、支払いステータスの変更をアラート含め自動化してほしい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2F5i000000aLjXEAU/view" target="_blank" rel="noopener">ProductRequest-15 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社山一商事</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 労務管理_デジタコ連動拡充</span>
+        <span class="req-date">2023-11-02</span>
+      </div>
+      <div class="req-text">デジタコからCSVで出力できるのでロジポケに連動して手入力の手間を削減したい。</div>
+    </div>
+    
+      </div>
+    </section>
+    
+
+    <section id="g4" class="group-section">
+      <div class="group-header">
+        <div class="group-num">§04</div>
+        <div class="group-head-main">
+          <h2 class="group-title">集合受講・複数人一括処理（教育・点呼）</h2>
+          <p class="group-summary">複数名の安全教育受講や点呼を一括で処理したい要望。1人ずつの入力が業務のボトルネックになっている。</p>
+        </div>
+      </div>
+      
+      <div class="group-stats">
+        <div class="gs"><span class="gs-label">件数</span><span class="gs-value">6<span class="unit">件</span></span></div>
+        <div class="gs"><span class="gs-label">企業数</span><span class="gs-value">6<span class="unit">社</span></span></div>
+        <div class="gs"><span class="gs-label">関連ARR</span><span class="gs-value mono">¥24,762,000</span></div>
+      </div>
+      
+      <div class="group-accounts">
+        <span class="ga-label">要望企業</span>
+        <span class="ga-list">加藤商事株式会社、吉川自動車運送株式会社、株式会社ひとまいるロジスティクス、株式会社アクティオトランスポート、株式会社丸山運送、高千穂倉庫運輸株式会社</span>
+      </div>
+      
+      <div class="req-list">
+        
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000003nKQT2A2/view" target="_blank" rel="noopener">ProductRequest-709 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社丸山運送</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">初任運転者講習</span>
+        
+        <span class="req-date">2026-05-21</span>
+      </div>
+      <div class="req-text">2〜3名の初任運転者を同時受講させたい。複数名選択で一括ステータス変更できる「集合受講ボタン」が欲しい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002ucZJ2AY/view" target="_blank" rel="noopener">ProductRequest-663 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社アクティオトランスポート</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">初任運転者講習</span>
+        
+        <span class="req-date">2026-04-02</span>
+      </div>
+      <div class="req-text">PC1台で複数名がログインして同時受講できるようにしたい。全員分が正しく受講済みとして記録される仕様。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000001DBDB2A4/view" target="_blank" rel="noopener">ProductRequest-453 <span class="ext">↗</span></a>
+        <div class="req-account">吉川自動車運送株式会社</div>
+        <div class="req-arr ">¥300,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ 集合教育</span>
+        <span class="req-date">2025-10-20</span>
+      </div>
+      <div class="req-text">集合教育完了後の記録を1人ずつ入力するのは大変。CSV・複数人一括入力対応と、複数営業所同時参加に対応してほしい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000008ZIL2A2/view" target="_blank" rel="noopener">ProductRequest-291 <span class="ext">↗</span></a>
+        <div class="req-account">高千穂倉庫運輸株式会社</div>
+        <div class="req-arr arr-high">¥3,420,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ コメント機能</span>
+        <span class="req-date">2025-04-16</span>
+      </div>
+      <div class="req-text">管理者コメントをドライバーに一括登録したい。60-100名規模だと1人ずつは難しい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000000kcIP2AY/view" target="_blank" rel="noopener">ProductRequest-384 <span class="ext">↗</span></a>
+        <div class="req-account">加藤商事株式会社</div>
+        <div class="req-arr arr-mid">¥1,512,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">点呼記録簿</span>
+        <span class="req-func">／ 点呼記録簿</span>
+        <span class="req-date">2025-08-20</span>
+      </div>
+      <div class="req-text">土日休みで月曜に土日分を出勤なし登録しないと点呼ができない×70名分。休日分の一括登録ボタンが欲しい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000001MPgj2AG/view" target="_blank" rel="noopener">ProductRequest-472 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社ひとまいるロジスティクス</div>
+        <div class="req-arr arr-high">¥19,530,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">点呼記録簿</span>
+        <span class="req-func">／ 点呼執行者情報の自動入力</span>
+        <span class="req-date">2025-10-31</span>
+      </div>
+      <div class="req-text">ログイン中の点呼執行者名を手動選択している。朝の点呼30-60名で全体30-60分の遅延に直結。自動入力したい。</div>
+    </div>
+    
+      </div>
+    </section>
+    
+
+    <section id="g5" class="group-section">
+      <div class="group-header">
+        <div class="group-num">§05</div>
+        <div class="group-head-main">
+          <h2 class="group-title">案件・配車・請求管理での手入力・二度手間</h2>
+          <p class="group-summary">案件登録・配車・請求書作成における手入力負荷や、他システムとの二度手間に関する要望。</p>
+        </div>
+      </div>
+      
+      <div class="group-stats">
+        <div class="gs"><span class="gs-label">件数</span><span class="gs-value">6<span class="unit">件</span></span></div>
+        <div class="gs"><span class="gs-label">企業数</span><span class="gs-value">6<span class="unit">社</span></span></div>
+        <div class="gs"><span class="gs-label">関連ARR</span><span class="gs-value mono">¥540,000</span></div>
+      </div>
+      
+      <div class="group-accounts">
+        <span class="ga-label">要望企業</span>
+        <span class="ga-list">ハコブ株式会社、東宝運輸商事株式会社、株式会社イマギイレ、株式会社ベジフルシステム石狩営業所、福岡トランス株式会社、菱華運輸株式会社</span>
+      </div>
+      
+      <div class="req-list">
+        
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002YJYX2A4/view" target="_blank" rel="noopener">ProductRequest-577 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社イマギイレ</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">案件管理</span>
+        <span class="req-func">／ スポット案件登録/定期案件登録</span>
+        <span class="req-date">2026-03-04</span>
+      </div>
+      <div class="req-text">配送ルートに郵便番号を入れたら住所を自動表示してほしい（番地は手入力でOK）。入力工数削減目的。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002cW8z2AE/view" target="_blank" rel="noopener">ProductRequest-613 <span class="ext">↗</span></a>
+        <div class="req-account">菱華運輸株式会社</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">請求管理</span>
+        <span class="req-func">／ 案件管理（請求書）</span>
+        <span class="req-date">2026-03-11</span>
+      </div>
+      <div class="req-text">請求書は荷主ごとにフォーマットが異なるが、現状ロジポケは固定フォーマット。工数削減につながらない。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002b82H2AQ/view" target="_blank" rel="noopener">ProductRequest-594 <span class="ext">↗</span></a>
+        <div class="req-account">株式会社ベジフルシステム石狩営業所</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">案件管理</span>
+        <span class="req-func">／ 案件管理（新配車表）</span>
+        <span class="req-date">2026-03-09</span>
+      </div>
+      <div class="req-text">現行グッドトラックでは案件管理がエクセルインポート可。運行指示書ひな形カスタマイズ、自動配車割り振り、請求書カスタマイズが切替条件。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000000Xpjh2AC/view" target="_blank" rel="noopener">ProductRequest-366 <span class="ext">↗</span></a>
+        <div class="req-account">東宝運輸商事株式会社</div>
+        <div class="req-arr ">¥540,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">案件管理</span>
+        <span class="req-func">／ スポット/定期案件登録</span>
+        <span class="req-date">2025-07-24</span>
+      </div>
+      <div class="req-text">案件登録時に車両とドライバーを同時登録できるようにしたい（入力工数削減）。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000000OYVB2A4/view" target="_blank" rel="noopener">ProductRequest-359 <span class="ext">↗</span></a>
+        <div class="req-account">ハコブ株式会社</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">日報管理</span>
+        <span class="req-func">／ 業務日報</span>
+        <span class="req-date">2025-07-01</span>
+      </div>
+      <div class="req-text">軽貨物で配送先がかなり多く1件ずつの案件登録が重い。簡易的な手入力で完結させたい（個人事業主・スマホ操作前提）。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FJ3000000KJ5iMAG/view" target="_blank" rel="noopener">ProductRequest-118 <span class="ext">↗</span></a>
+        <div class="req-account">福岡トランス株式会社</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">案件管理</span>
+        <span class="req-func">／ トレーラー対応</span>
+        <span class="req-date">2024-08-21</span>
+      </div>
+      <div class="req-text">請求書と給与計算で別々の打込みが発生し二度手間。配車段階で複数車両を1つのデータとして入力したい。</div>
+    </div>
+    
+      </div>
+    </section>
+    
+
+    <section id="g6" class="group-section">
+      <div class="group-header">
+        <div class="group-num">§06</div>
+        <div class="group-head-main">
+          <h2 class="group-title">教育・台帳まわりのUI改善（手入力体験の改善）</h2>
+          <p class="group-summary">受講履歴・実技時間・整備履歴など、入力UIの改善で手入力負荷を減らしたい要望。</p>
+        </div>
+      </div>
+      
+      <div class="group-stats">
+        <div class="gs"><span class="gs-label">件数</span><span class="gs-value">5<span class="unit">件</span></span></div>
+        <div class="gs"><span class="gs-label">企業数</span><span class="gs-value">4<span class="unit">社</span></span></div>
+        <div class="gs"><span class="gs-label">関連ARR</span><span class="gs-value mono">¥8,784,000</span></div>
+      </div>
+      
+      <div class="group-accounts">
+        <span class="ga-label">要望企業</span>
+        <span class="ga-list">アストラックス株式会社、パスコ･ロジスティクス株式会社、日本興運株式会社、高千穂倉庫運輸株式会社</span>
+      </div>
+      
+      <div class="req-list">
+        
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000000IsDF2A0/view" target="_blank" rel="noopener">ProductRequest-341 <span class="ext">↗</span></a>
+        <div class="req-account">高千穂倉庫運輸株式会社</div>
+        <div class="req-arr arr-high">¥3,420,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">初任運転者講習</span>
+        <span class="req-func">／ 添乗指導</span>
+        <span class="req-date">2025-06-17</span>
+      </div>
+      <div class="req-text">実技時間を手入力しようとするとバグが発生。スクロールで1分単位の入力が大変。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000004t7Z2AQ/view" target="_blank" rel="noopener">ProductRequest-189 <span class="ext">↗</span></a>
+        <div class="req-account">アストラックス株式会社</div>
+        <div class="req-arr arr-mid">¥1,080,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ 受講履歴</span>
+        <span class="req-date">2024-12-24</span>
+      </div>
+      <div class="req-text">受講履歴登録の時間入力を手入力から選択制にしてほしい。120名の従業員受講履歴で手入力が手間。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000004t4L2AQ/view" target="_blank" rel="noopener">ProductRequest-188 <span class="ext">↗</span></a>
+        <div class="req-account">アストラックス株式会社</div>
+        <div class="req-arr arr-mid">¥1,080,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ 受講履歴</span>
+        <span class="req-date">2024-12-24</span>
+      </div>
+      <div class="req-text">受講履歴登録の乗務員選択を従業員番号で検索/ソートできるようにしてほしい。約120名で探しづらい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000004ttx2AA/view" target="_blank" rel="noopener">ProductRequest-198 <span class="ext">↗</span></a>
+        <div class="req-account">日本興運株式会社</div>
+        <div class="req-arr ">¥480,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">その他</span>
+        <span class="req-func">／ 車両管理</span>
+        <span class="req-date">2024-12-25</span>
+      </div>
+      <div class="req-text">修理整備の記録や購入部品・交換履歴を実施日時順に並び替えたい。履歴入力中に前回分を確認するため時系列管理を希望。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000001DB3V2AW/view" target="_blank" rel="noopener">ProductRequest-451 <span class="ext">↗</span></a>
+        <div class="req-account">パスコ･ロジスティクス株式会社</div>
+        <div class="req-arr arr-mid">¥2,724,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ コメント機能</span>
+        <span class="req-date">2025-10-20</span>
+      </div>
+      <div class="req-text">ドライバーのコメント入力に時間がかかる。文言テンプレートを3〜4つから選択できる設定が欲しい。</div>
+    </div>
+    
+      </div>
+    </section>
+    
+
+    <section id="g7" class="group-section">
+      <div class="group-header">
+        <div class="group-num">§07</div>
+        <div class="group-head-main">
+          <h2 class="group-title">計画・コンテンツの複製・展開機能</h2>
+          <p class="group-summary">本社で作成した計画や独自教材を、複数事業所・支店に効率よく展開・コピーしたい要望。</p>
+        </div>
+      </div>
+      
+      <div class="group-stats">
+        <div class="gs"><span class="gs-label">件数</span><span class="gs-value">3<span class="unit">件</span></span></div>
+        <div class="gs"><span class="gs-label">企業数</span><span class="gs-value">3<span class="unit">社</span></span></div>
+        <div class="gs"><span class="gs-label">関連ARR</span><span class="gs-value mono">¥2,316,000</span></div>
+      </div>
+      
+      <div class="group-accounts">
+        <span class="ga-label">要望企業</span>
+        <span class="ga-list">キユーソーアレスト株式会社宇治田原営業所、京極運輸商事株式会社、長門運輸株式会社</span>
+      </div>
+      
+      <div class="req-list">
+        
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002g0Tt2AI/view" target="_blank" rel="noopener">ProductRequest-646 <span class="ext">↗</span></a>
+        <div class="req-account">長門運輸株式会社</div>
+        <div class="req-arr ">¥420,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">初任運転者講習</span>
+        <span class="req-func">／ 実技チェックリストの出力</span>
+        <span class="req-date">2026-03-19</span>
+      </div>
+      <div class="req-text">実技チェックリストの出力をロジポケ内で完結したい。メールPDFを別途保管するのは手間。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2F5i000006Q8XGEA0/view" target="_blank" rel="noopener">ProductRequest-59 <span class="ext">↗</span></a>
+        <div class="req-account">京極運輸商事株式会社</div>
+        <div class="req-arr arr-mid">¥1,896,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ 年間計画_コピー機能</span>
+        <span class="req-date">2024-04-18</span>
+      </div>
+      <div class="req-text">年間計画書を本社一括作成→各事業所に自動更新する仕組みが欲しい。一部修正でも事業所ごとに都度編集が必要で手間。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FJ3000000KalZMAS/view" target="_blank" rel="noopener">ProductRequest-120 <span class="ext">↗</span></a>
+        <div class="req-account">キユーソーアレスト株式会社宇治田原営業所</div>
+        <div class="req-arr ">—</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ 資料一覧_自社独自コンテンツ作成（モビ機能）</span>
+        <span class="req-date">2024-08-28</span>
+      </div>
+      <div class="req-text">今月の項目に自社教育（PDF・動画）を貼り付けたい。お知らせはドライバーがアドレスを持たず管理者経由になり二度手間。</div>
+    </div>
+    
+      </div>
+    </section>
+    
+
+    <section id="g8" class="group-section">
+      <div class="group-header">
+        <div class="group-num">§08</div>
+        <div class="group-head-main">
+          <h2 class="group-title">動画教材検索・絞り込みでの工数削減</h2>
+          <p class="group-summary">動画教材の検索・絞り込み・倍速視聴で、管理者の選定工数を削減したい要望。</p>
+        </div>
+      </div>
+      
+      <div class="group-stats">
+        <div class="gs"><span class="gs-label">件数</span><span class="gs-value">2<span class="unit">件</span></span></div>
+        <div class="gs"><span class="gs-label">企業数</span><span class="gs-value">2<span class="unit">社</span></span></div>
+        <div class="gs"><span class="gs-label">関連ARR</span><span class="gs-value mono">¥300,000</span></div>
+      </div>
+      
+      <div class="group-accounts">
+        <span class="ga-label">要望企業</span>
+        <span class="ga-list">及能株式会社、有限会社明鶴流通</span>
+      </div>
+      
+      <div class="req-list">
+        
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB0000038gl72AA/view" target="_blank" rel="noopener">ProductRequest-681 <span class="ext">↗</span></a>
+        <div class="req-account">及能株式会社</div>
+        <div class="req-arr ">¥120,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">フォークリフト・倉庫動画</span>
+        
+        <span class="req-date">2026-04-16</span>
+      </div>
+      <div class="req-text">動画一覧にカテゴリー絞り込み（タグ選択）UIを追加し、目的のジャンルに即アクセスできるようにしたい。</div>
+    </div>
+    
+
+    <div class="req-card">
+      <div class="req-head">
+        <a class="req-no" href="https://xmile3.lightning.force.com/lightning/r/Product_Improvement__c/a2FRB000002OoH32AK/view" target="_blank" rel="noopener">ProductRequest-562 <span class="ext">↗</span></a>
+        <div class="req-account">有限会社明鶴流通</div>
+        <div class="req-arr ">¥180,000</div>
+      </div>
+      <div class="req-meta">
+        <span class="req-service">安全教育</span>
+        <span class="req-func">／ 動画教材の検索の改善 管理者としての視聴は制御なしにしたい。</span>
+        <span class="req-date">2026-02-17</span>
+      </div>
+      <div class="req-text">管理者は動画を倍速・スキップで視聴できるようにし、動画選定の工数を削減したい。</div>
+    </div>
+    
+      </div>
+    </section>
+    
+
+<footer class="footer">
+  <span>Source: Salesforce Product_Improvement__c · Filtered by input-workload-reduction keywords</span>
+  <span class="footer-brand">X MILE × CLAUDE · 2026.05.23</span>
+</footer>
+
+</div>
+
+<script>
+Chart.defaults.font.family = "'Inter', -apple-system, 'Hiragino Kaku Gothic ProN', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#555555';
+
+const COLORS = {
+  accent: '#C8553D', accentSoft: '#E9B384',
+  teal: '#2C5F5D', gold: '#B8860B', ink: '#1A1A1A',
+  line: '#E5DFD2', mute: '#888888'
+};
+
+// テーマ別
+const gd = {"labels": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"], "counts": [5, 7, 11, 6, 6, 5, 3, 2], "titles": ["紙書類・画像からのOCR / 自動読み取り", "CSV / Excel一括インポート・エクスポートの拡充", "デジタコ・アルコールチェッカー等の外部機器との自動連携", "集合受講・複数人一括処理（教育・点呼）", "案件・配車・請求管理での手入力・二度手間", "教育・台帳まわりのUI改善（手入力体験の改善）", "計画・コンテンツの複製・展開機能", "動画教材検索・絞り込みでの工数削減"]};
+new Chart(document.getElementById('groupChart'), {
+  type: 'bar',
+  data: {
+    labels: gd.labels,
+    datasets: [{
+      data: gd.counts,
+      backgroundColor: gd.labels.map((_, i) => i === 0 ? COLORS.accent : (i < 3 ? COLORS.teal : COLORS.accentSoft)),
+      borderWidth: 0, borderRadius: 2
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          title: (items) => gd.titles[items[0].dataIndex],
+          label: (ctx) => `${ctx.parsed.y}件`
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: COLORS.ink, font: { size: 12, weight: 500 } } },
+      y: { beginAtZero: true, grid: { color: COLORS.line }, ticks: { color: COLORS.mute, stepSize: 2 } }
+    }
+  }
+});
+
+// サービス別
+const sd = {"labels": ["その他", "安全教育", "案件管理", "初任運転者講習", "車両台帳", "新規機能", "点呼記録簿", "従業員台帳", "勤怠管理", "経営管理ダッシュボード"], "counts": [13, 11, 5, 4, 2, 2, 2, 1, 1, 1]};
+new Chart(document.getElementById('serviceChart'), {
+  type: 'bar',
+  data: {
+    labels: sd.labels,
+    datasets: [{
+      data: sd.counts,
+      backgroundColor: COLORS.teal,
+      borderWidth: 0, borderRadius: 2
+    }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { beginAtZero: true, grid: { color: COLORS.line }, ticks: { color: COLORS.mute, stepSize: 1 } },
+      y: { grid: { display: false }, ticks: { color: COLORS.ink, font: { size: 11 } } }
+    }
+  }
+});
+
+// 企業別
+const ad = {"labels": ["イオンネクストデリバリー株式会社", "アストラックス株式会社", "日発運輸株式会社", "高千穂倉庫運輸株式会社"], "counts": [4, 3, 2, 2]};
+new Chart(document.getElementById('accountChart'), {
+  type: 'bar',
+  data: {
+    labels: ad.labels,
+    datasets: [{
+      data: ad.counts,
+      backgroundColor: COLORS.accent,
+      borderWidth: 0, borderRadius: 2
+    }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: (ctx) => `${ctx.parsed.x}件の要望` } }
+    },
+    scales: {
+      x: { beginAtZero: true, grid: { color: COLORS.line }, ticks: { color: COLORS.mute, stepSize: 1 } },
+      y: { grid: { display: false }, ticks: { color: COLORS.ink, font: { size: 12, weight: 500 } } }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
